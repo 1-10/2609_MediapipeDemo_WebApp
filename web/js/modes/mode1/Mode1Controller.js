@@ -7,6 +7,7 @@ import { draw as drawSilhouette } from "./SilhouetteRenderer.js";
 /**
  * @typedef {import("../../../../shared/types.js").FaceDetection} FaceDetection
  * @typedef {import("../../../../shared/types.js").FrameContext} FrameContext
+ * @typedef {import("../../../../shared/types.js").Mode1DebugMetrics} Mode1DebugMetrics
  * @typedef {import("../../../../shared/types.js").Mode1FrameState} Mode1FrameState
  * @typedef {import("../../../../shared/types.js").SegmentationMask} SegmentationMask
  *
@@ -49,6 +50,12 @@ export class Mode1Controller {
     this.segmentationInferenceBusy = false;
     this.lastFaceInferenceTimestampMs = INITIAL_INFERENCE_TIMESTAMP_MS;
     this.lastSegmentationInferenceTimestampMs = INITIAL_INFERENCE_TIMESTAMP_MS;
+    /** @type {number | undefined} */
+    this.faceInferenceMs = undefined;
+    /** @type {number | undefined} */
+    this.segmentationInferenceMs = undefined;
+    /** @type {number | undefined} */
+    this.lastFrameId = undefined;
 
     this.handleFrame = this.handleFrame.bind(this);
   }
@@ -109,9 +116,21 @@ export class Mode1Controller {
     };
 
     this.frameState = frameState;
+    this.lastFrameId = frameContext.frameId;
     this.drawFrame(frameState);
     this.maybeRunSegmentation(videoFrame, frameContext.timestampMs);
     this.maybeRunFaceDetection(videoFrame, frameContext.timestampMs);
+  }
+
+  /** @returns {Mode1DebugMetrics} */
+  getDebugMetrics() {
+    return {
+      faceInferenceMs: this.faceInferenceMs,
+      segmentationInferenceMs: this.segmentationInferenceMs,
+      faceConfidences: this.faceDetections.map(({ score }) => score),
+      segmentationThreshold: this.config.segmentation.threshold,
+      frameId: this.lastFrameId,
+    };
   }
 
   /**
@@ -207,7 +226,12 @@ export class Mode1Controller {
           return this.personMask;
         }
 
-        return this.segmentationService.segmentForVideo(videoFrame, timestampMs);
+        const inferenceStartMs = performance.now();
+        try {
+          return this.segmentationService.segmentForVideo(videoFrame, timestampMs);
+        } finally {
+          this.segmentationInferenceMs = performance.now() - inferenceStartMs;
+        }
       })
       .then((personMask) => {
         if (this.isCurrentRun(runToken) && personMask) {
@@ -253,7 +277,12 @@ export class Mode1Controller {
           return this.faceDetections;
         }
 
-        return this.faceDetectorService.detectForVideo(videoFrame, timestampMs);
+        const inferenceStartMs = performance.now();
+        try {
+          return this.faceDetectorService.detectForVideo(videoFrame, timestampMs);
+        } finally {
+          this.faceInferenceMs = performance.now() - inferenceStartMs;
+        }
       })
       .then((faceDetections) => {
         if (this.isCurrentRun(runToken)) {
