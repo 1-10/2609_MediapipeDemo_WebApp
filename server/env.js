@@ -14,6 +14,14 @@ export function getHfToken() {
   return process.env.HF_TOKEN;
 }
 
+export function getImageGenerationModel() {
+  return process.env.HF_IMAGE_MODEL || undefined;
+}
+
+export function isHfApiDisabled() {
+  return process.env.DISABLE_HF_API === "1";
+}
+
 export function getPort() {
   const port = Number(process.env.PORT);
 
