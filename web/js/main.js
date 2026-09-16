@@ -13,6 +13,10 @@ const elements = {
   silhouetteCanvas: document.getElementById("silhouetteCanvas"),
   mosaicCanvas: document.getElementById("mosaicCanvas"),
   faceOverlayCanvas: document.getElementById("faceOverlayCanvas"),
+  mode2LeftVideoCanvas: document.getElementById("mode2LeftVideoCanvas"),
+  semanticInfoList: document.getElementById("semanticInfoList"),
+  mode1Panes: document.getElementById("mode1Panes"),
+  mode2Panes: document.getElementById("mode2Panes"),
   mode1Button: document.getElementById("mode1Button"),
   mode2Button: document.getElementById("mode2Button"),
 };
@@ -42,7 +46,11 @@ async function init() {
     mosaic: elements.mosaicCanvas,
     faceOverlay: elements.faceOverlayCanvas,
   });
-  const mode2Controller = new Mode2Controller();
+  const mode2Controller = new Mode2Controller({
+    config,
+    leftVideoCanvas: elements.mode2LeftVideoCanvas,
+    semanticInfoContainer: elements.semanticInfoList,
+  });
   const modeController = new ModeController({
     mode1: mode1Controller,
     mode2: mode2Controller,
@@ -72,6 +80,7 @@ function applyCanvasSize(cameraConfig) {
     elements.silhouetteCanvas,
     elements.mosaicCanvas,
     elements.faceOverlayCanvas,
+    elements.mode2LeftVideoCanvas,
   ]) {
     canvas.width = cameraConfig.width;
     canvas.height = cameraConfig.height;
@@ -108,6 +117,10 @@ function setActiveMode(mode) {
   elements.mode2Button.classList.toggle("is-active", mode === "mode2");
   elements.mode1Button.setAttribute("aria-pressed", String(mode === "mode1"));
   elements.mode2Button.setAttribute("aria-pressed", String(mode === "mode2"));
+  elements.mode1Panes.classList.toggle("is-hidden", mode !== "mode1");
+  elements.mode2Panes.classList.toggle("is-hidden", mode !== "mode2");
+  elements.mode1Panes.setAttribute("aria-hidden", String(mode !== "mode1"));
+  elements.mode2Panes.setAttribute("aria-hidden", String(mode !== "mode2"));
 }
 
 function showCameraUnavailable() {
