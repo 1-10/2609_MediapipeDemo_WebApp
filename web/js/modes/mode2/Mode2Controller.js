@@ -8,6 +8,7 @@ import { formatSemanticLines } from "./SemanticInfoFormatter.js";
 
 /**
  * @typedef {import("../../../../shared/types.js").FrameContext} FrameContext
+ * @typedef {import("../../../../shared/types.js").Mode2DebugMetrics} Mode2DebugMetrics
  * @typedef {import("../../../../shared/types.js").SemanticPacket} SemanticPacket
  *
  * @typedef {object} Mode2ControllerOptions
@@ -46,6 +47,11 @@ export class Mode2Controller {
     this.lastRenderedPacketKey = "";
     this.lastGeneratedPacketKey = "";
     this.generationStatus = GenerationStatus.idle;
+    /** @type {Mode2DebugMetrics} */
+    this.debugMetrics = {
+      generatorErrorCount: 0,
+      generatedImageCount: 0,
+    };
 
     this.handleFrame = this.handleFrame.bind(this);
   }
@@ -100,8 +106,15 @@ export class Mode2Controller {
     this.drawLiveVideo(videoFrame);
 
     if (this.servicesReady && this.semanticExtractor) {
+      const detectionStartedAt = performance.now();
       this.semanticExtractor.tick(videoFrame, frameContext.timestampMs);
+      this.debugMetrics.objectDetectionMs = performance.now() - detectionStartedAt;
       const packet = this.semanticExtractor.getLatestPacket();
+      if (packet) {
+        this.debugMetrics.semanticPacketBytes = new TextEncoder().encode(
+          JSON.stringify(packet),
+        ).length;
+      }
       this.renderLatestPacket(packet);
       this.generateLatestPacket(packet);
     }
@@ -122,6 +135,7 @@ export class Mode2Controller {
     }
 
     const prompt = buildPrompt(packet, this.config.imageGeneration);
+    this.debugMetrics.promptLength = prompt.length;
     this.lastGeneratedPacketKey = packetKey;
     this.generationStatus = GenerationStatus.generating;
     renderReconstruction(this.reconstructionContainer, {
@@ -138,8 +152,12 @@ export class Mode2Controller {
    * @returns {Promise<void>}
    */
   async requestGeneration(prompt, runToken) {
+    const generationStartedAt = performance.now();
+
     try {
       const result = await generateImage(prompt);
+      this.debugMetrics.imageGenerationLatencyMs = performance.now() - generationStartedAt;
+      this.debugMetrics.generatedImageCount += 1;
       if (!this.isCurrentRun(runToken)) {
         return;
       }
@@ -150,6 +168,8 @@ export class Mode2Controller {
         imageUrl: result.imageUrl,
       });
     } catch (error) {
+      this.debugMetrics.imageGenerationLatencyMs = performance.now() - generationStartedAt;
+      this.debugMetrics.generatorErrorCount += 1;
       if (!this.isCurrentRun(runToken)) {
         return;
       }
@@ -238,6 +258,11 @@ export class Mode2Controller {
   /** @param {number} runToken */
   isCurrentRun(runToken) {
     return this.isRunning && this.runToken === runToken;
+  }
+
+  /** @returns {Mode2DebugMetrics} */
+  getDebugMetrics() {
+    return { ...this.debugMetrics };
   }
 }
 
