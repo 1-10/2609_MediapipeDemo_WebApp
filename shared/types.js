@@ -42,6 +42,13 @@ export const GenerationStatus = Object.freeze({
  */
 
 /**
+ * @typedef {object} ObjectDetection
+ * @property {BoundingBox} boundingBox
+ * @property {string} label
+ * @property {number} score
+ */
+
+/**
  * @typedef {object} SegmentationMask
  * @property {number} width
  * @property {number} height
