@@ -3,6 +3,7 @@
  */
 
 const MIN_TIMESTAMP_STEP_MS = 0.001;
+const FPS_WINDOW_MS = 1_000;
 
 export class FrameHub {
   /**
@@ -16,6 +17,8 @@ export class FrameHub {
     this.animationFrameId = null;
     this.lastTimestampMs = 0;
     this.isRunning = false;
+    /** @type {number[]} */
+    this.fpsTickTimestampsMs = [];
 
     this.tick = this.tick.bind(this);
   }
@@ -53,6 +56,21 @@ export class FrameHub {
   }
 
   /**
+   * @returns {number}
+   */
+  getFramesPerSecond() {
+    if (this.fpsTickTimestampsMs.length < 2) {
+      return 0;
+    }
+
+    const firstTimestampMs = this.fpsTickTimestampsMs[0];
+    const lastTimestampMs = this.fpsTickTimestampsMs.at(-1);
+    const elapsedMs = lastTimestampMs - firstTimestampMs;
+
+    return ((this.fpsTickTimestampsMs.length - 1) * 1_000) / elapsedMs;
+  }
+
+  /**
    * @param {DOMHighResTimeStamp} timestampMs
    */
   tick(timestampMs) {
@@ -74,6 +92,12 @@ export class FrameHub {
     };
 
     this.frameId += 1;
+
+    this.fpsTickTimestampsMs.push(nextTimestampMs);
+    const windowStartTimestampMs = nextTimestampMs - FPS_WINDOW_MS;
+    while (this.fpsTickTimestampsMs[0] < windowStartTimestampMs) {
+      this.fpsTickTimestampsMs.shift();
+    }
 
     for (const subscriber of this.subscribers) {
       subscriber(frameContext);
