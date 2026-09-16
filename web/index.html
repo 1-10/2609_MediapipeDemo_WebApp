@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MediaPipe Demo App</title>
+    <link rel="stylesheet" href="/css/app.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <h1>MediaPipe Demo App</h1>
+        <nav class="mode-switcher" aria-label="Mode switcher">
+          <button id="mode1Button" class="mode-button is-active" type="button">Mode 1</button>
+          <button id="mode2Button" class="mode-button" type="button">Mode 2</button>
+        </nav>
+      </header>
+
+      <p id="statusMessage" class="status-message" role="status">Starting camera...</p>
+
+      <video id="cameraSource" class="camera-source" autoplay muted playsinline aria-hidden="true"></video>
+
+      <section id="mode1Panes" class="mode1-panes" aria-label="Mode 1 abstraction comparison">
+        <article class="pane">
+          <h2>侵入者検知</h2>
+          <canvas id="silhouetteCanvas" width="1280" height="720"></canvas>
+        </article>
+        <article class="pane">
+          <h2>プライバシー配慮</h2>
+          <canvas id="mosaicCanvas" width="1280" height="720"></canvas>
+        </article>
+        <article class="pane">
+          <h2>顔認証映像</h2>
+          <canvas id="faceOverlayCanvas" width="1280" height="720"></canvas>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>
