@@ -1,0 +1,43 @@
+{
+  "camera": {
+    "width": 1280,
+    "height": 720,
+    "targetFps": 30
+  },
+  "faceDetector": {
+    "modelUrl": "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite",
+    "minDetectionConfidence": 0.5,
+    "inferenceIntervalMs": 66
+  },
+  "segmentation": {
+    "modelUrl": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+    "threshold": 0.5,
+    "inferenceIntervalMs": 66,
+    "silhouetteColor": "#ffffff",
+    "backgroundColor": "#000000"
+  },
+  "mosaic": {
+    "blockSize": 12,
+    "bboxExpansionHorizontal": 0.15,
+    "bboxExpansionVertical": 0.15
+  },
+  "objectDetector": {
+    "modelUrl": "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/latest/efficientdet_lite0.tflite",
+    "scoreThreshold": 0.5,
+    "maxResults": 10,
+    "inferenceIntervalMs": 300
+  },
+  "semantic": {
+    "updateIntervalMs": 750
+  },
+  "imageGeneration": {
+    "provider": "huggingface",
+    "model": "black-forest-labs/FLUX.1-schnell",
+    "width": 512,
+    "height": 512,
+    "stylePreset": "simple flat illustration, clean anime-like rendering"
+  },
+  "debug": {
+    "enabled": false
+  }
+}
