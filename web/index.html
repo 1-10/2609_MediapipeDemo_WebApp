@@ -34,6 +34,21 @@
           <canvas id="faceOverlayCanvas" width="1280" height="720"></canvas>
         </article>
       </section>
+
+      <section id="mode2Panes" class="mode2-panes is-hidden" aria-label="Mode 2 semantic communication" aria-hidden="true">
+        <article class="pane">
+          <h2>LIVE VIDEO</h2>
+          <canvas id="mode2LeftVideoCanvas" width="1280" height="720"></canvas>
+        </article>
+        <article class="pane semantic-pane">
+          <h2>TRANSMITTED SEMANTICS</h2>
+          <ul id="semanticInfoList" class="semantic-info-list"></ul>
+        </article>
+        <article class="pane reconstruction-pane">
+          <h2>RECONSTRUCTION</h2>
+          <div class="reconstruction-placeholder">Coming soon</div>
+        </article>
+      </section>
     </main>
 
     <script type="module" src="/js/main.js"></script>

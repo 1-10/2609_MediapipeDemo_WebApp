@@ -71,10 +71,16 @@ body {
   display: none;
 }
 
-.mode1-panes {
+.mode1-panes,
+.mode2-panes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.mode1-panes.is-hidden,
+.mode2-panes.is-hidden {
+  display: none;
 }
 
 .pane {
@@ -95,6 +101,35 @@ body {
   background: #050608;
 }
 
+.semantic-pane,
+.reconstruction-pane {
+  min-height: 240px;
+}
+
+.semantic-info-list {
+  min-height: 160px;
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid #303743;
+  background: #050608;
+  color: #f4f7fb;
+  line-height: 1.5;
+}
+
+.semantic-info-list:empty::before {
+  content: "Waiting for semantic data";
+  color: #8f9aaa;
+}
+
+.reconstruction-placeholder {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  border: 1px solid #303743;
+  background: #050608;
+  color: #8f9aaa;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     padding: 16px;
@@ -105,7 +140,8 @@ body {
     flex-direction: column;
   }
 
-  .mode1-panes {
+  .mode1-panes,
+  .mode2-panes {
     grid-template-columns: 1fr;
   }
 }
