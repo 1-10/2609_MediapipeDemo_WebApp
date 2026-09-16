@@ -10,6 +10,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@huggingface/inference": "^4.13.28",
     "@mediapipe/tasks-vision": "^1.0.1"
   }
 }
