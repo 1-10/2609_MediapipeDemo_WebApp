@@ -3,6 +3,7 @@ import { FrameHub } from "./camera/FrameHub.js";
 import { ModeController } from "./modes/ModeController.js";
 import { Mode1Controller } from "./modes/mode1/Mode1Controller.js";
 import { Mode2Controller } from "./modes/mode2/Mode2Controller.js";
+import { render as renderDebugOverlay } from "./debug/DebugOverlay.js";
 import { CameraState } from "../../shared/types.js";
 
 const CONFIG_URL = "/config/app.config.json";
@@ -22,6 +23,17 @@ const elements = {
   mode2Button: document.getElementById("mode2Button"),
 };
 
+let frameHub;
+let mode1Controller;
+let mode2Controller;
+let modeController;
+
+if (new URLSearchParams(location.search).get("debug") === "true") {
+  const debugContainer = document.createElement("div");
+  document.body.append(debugContainer);
+  setInterval(() => renderDebugMetrics(debugContainer), 500);
+}
+
 init().catch(() => {
   showMessage("Application unavailable", "Please reload the page.");
 });
@@ -40,20 +52,20 @@ async function init() {
 
   await attachCameraSource(cameraResult.videoElement);
 
-  const frameHub = new FrameHub(elements.cameraSource);
-  const mode1Controller = new Mode1Controller({
+  frameHub = new FrameHub(elements.cameraSource);
+  mode1Controller = new Mode1Controller({
     config,
     silhouette: elements.silhouetteCanvas,
     mosaic: elements.mosaicCanvas,
     faceOverlay: elements.faceOverlayCanvas,
   });
-  const mode2Controller = new Mode2Controller({
+  mode2Controller = new Mode2Controller({
     config,
     leftVideoCanvas: elements.mode2LeftVideoCanvas,
     semanticInfoContainer: elements.semanticInfoList,
     reconstructionContainer: elements.reconstructionContainer,
   });
-  const modeController = new ModeController({
+  modeController = new ModeController({
     mode1: mode1Controller,
     mode2: mode2Controller,
   });
@@ -63,6 +75,29 @@ async function init() {
   frameHub.start();
   showMessage("Camera ready", "");
   setActiveMode("mode1");
+}
+
+/** @param {HTMLElement} debugContainer */
+function renderDebugMetrics(debugContainer) {
+  if (!frameHub || !mode1Controller || !mode2Controller || !modeController) {
+    return;
+  }
+
+  const framesPerSecond = frameHub.getFramesPerSecond();
+  const metrics = {
+    common: {
+      cameraFps: framesPerSecond,
+      renderFps: framesPerSecond,
+    },
+  };
+
+  if (modeController.activeMode === "mode1") {
+    metrics.mode1 = mode1Controller.getDebugMetrics();
+  } else if (modeController.activeMode === "mode2") {
+    metrics.mode2 = mode2Controller.getDebugMetrics();
+  }
+
+  renderDebugOverlay(debugContainer, metrics);
 }
 
 async function loadConfig() {
