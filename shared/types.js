@@ -106,3 +106,31 @@ export const GenerationStatus = Object.freeze({
  * @typedef {object} ImageGenerator
  * @property {(req: GenerateRequest) => Promise<GeneratedImage>} generate
  */
+
+/**
+ * @typedef {object} Mode1DebugMetrics
+ * @property {number} [faceInferenceMs]
+ * @property {number} [segmentationInferenceMs]
+ * @property {number[]} [faceConfidences]
+ * @property {number} [segmentationThreshold]
+ * @property {number} [frameId]
+ */
+
+/**
+ * @typedef {object} Mode2DebugMetrics
+ * @property {number} [objectDetectionMs]
+ * @property {number} [semanticPacketBytes]
+ * @property {number} [promptLength]
+ * @property {number} [imageGenerationLatencyMs]
+ * @property {number} [generatorErrorCount]
+ * @property {number} [generatedImageCount]
+ */
+
+/**
+ * @typedef {object} DebugMetrics
+ * @property {object} common
+ * @property {number} [common.cameraFps]
+ * @property {number} [common.renderFps]
+ * @property {Mode1DebugMetrics} [mode1]
+ * @property {Mode2DebugMetrics} [mode2]
+ */
