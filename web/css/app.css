@@ -93,6 +93,19 @@ body {
   font-weight: 700;
 }
 
+.bandwidth-label {
+  margin: 0 0 8px;
+  color: #c7d0dc;
+  font-size: 13px;
+}
+
+.bandwidth-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #8f9aaa;
+  font-size: 12px;
+}
+
 .pane canvas {
   display: block;
   width: 100%;
