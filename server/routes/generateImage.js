@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 
+import { getImageGenerationModel } from "../env.js";
 import { GenerationSupersededError } from "../generation/GenerationQueue.js";
 import {
   HuggingFaceApiError,
@@ -11,7 +12,10 @@ import {
 const appConfig = JSON.parse(
   readFileSync(new URL("../../config/app.config.json", import.meta.url), "utf8"),
 );
-const imageGenerationConfig = Object.freeze({ ...appConfig.imageGeneration });
+const imageGenerationConfig = Object.freeze({
+  ...appConfig.imageGeneration,
+  model: getImageGenerationModel() ?? appConfig.imageGeneration.model,
+});
 
 /**
  * @param {object} options
