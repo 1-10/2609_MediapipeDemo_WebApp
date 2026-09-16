@@ -1,0 +1,8 @@
+node_modules/
+.env
+web/vendor/
+.DS_Store
+**/.DS_Store
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/skills/cmux-delegate-workspace/
