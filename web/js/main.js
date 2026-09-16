@@ -15,6 +15,7 @@ const elements = {
   faceOverlayCanvas: document.getElementById("faceOverlayCanvas"),
   mode2LeftVideoCanvas: document.getElementById("mode2LeftVideoCanvas"),
   semanticInfoList: document.getElementById("semanticInfoList"),
+  reconstructionContainer: document.getElementById("reconstructionContainer"),
   mode1Panes: document.getElementById("mode1Panes"),
   mode2Panes: document.getElementById("mode2Panes"),
   mode1Button: document.getElementById("mode1Button"),
@@ -50,6 +51,7 @@ async function init() {
     config,
     leftVideoCanvas: elements.mode2LeftVideoCanvas,
     semanticInfoContainer: elements.semanticInfoList,
+    reconstructionContainer: elements.reconstructionContainer,
   });
   const modeController = new ModeController({
     mode1: mode1Controller,

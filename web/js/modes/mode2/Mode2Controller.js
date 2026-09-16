@@ -1,4 +1,8 @@
 import { createObjectDetectorService } from "../../mediapipe/ObjectDetectorService.js";
+import { generateImage } from "../../generation/GenerationClient.js";
+import { GenerationStatus } from "../../../../shared/types.js";
+import { buildPrompt } from "./PromptBuilder.js";
+import { render as renderReconstruction } from "./ReconstructionRenderer.js";
 import { createSemanticExtractor } from "./SemanticExtractor.js";
 import { formatSemanticLines } from "./SemanticInfoFormatter.js";
 
@@ -10,6 +14,7 @@ import { formatSemanticLines } from "./SemanticInfoFormatter.js";
  * @property {object} config
  * @property {HTMLCanvasElement | CanvasRenderingContext2D} leftVideoCanvas
  * @property {Element} semanticInfoContainer
+ * @property {HTMLElement} reconstructionContainer
  */
 
 export class Mode2Controller {
@@ -23,9 +28,14 @@ export class Mode2Controller {
       throw new TypeError("Mode2Controller requires a semantic info container.");
     }
 
+    if (!options?.reconstructionContainer) {
+      throw new TypeError("Mode2Controller requires a reconstruction container.");
+    }
+
     this.config = options.config;
     this.leftVideoCtx = get2dContext(options.leftVideoCanvas, "leftVideoCanvas");
     this.semanticInfoContainer = options.semanticInfoContainer;
+    this.reconstructionContainer = options.reconstructionContainer;
 
     this.frameHub = null;
     this.isRunning = false;
@@ -34,6 +44,8 @@ export class Mode2Controller {
     this.semanticExtractor = null;
     this.servicesReady = false;
     this.lastRenderedPacketKey = "";
+    this.lastGeneratedPacketKey = "";
+    this.generationStatus = GenerationStatus.idle;
 
     this.handleFrame = this.handleFrame.bind(this);
   }
@@ -52,6 +64,9 @@ export class Mode2Controller {
     this.isRunning = true;
     this.runToken += 1;
     const runToken = this.runToken;
+    this.lastGeneratedPacketKey = "";
+    this.generationStatus = GenerationStatus.idle;
+    renderReconstruction(this.reconstructionContainer, { status: GenerationStatus.idle });
 
     this.frameHub.subscribe(this.handleFrame);
     void this.prepareServices(runToken);
@@ -86,7 +101,64 @@ export class Mode2Controller {
 
     if (this.servicesReady && this.semanticExtractor) {
       this.semanticExtractor.tick(videoFrame, frameContext.timestampMs);
-      this.renderLatestPacket(this.semanticExtractor.getLatestPacket());
+      const packet = this.semanticExtractor.getLatestPacket();
+      this.renderLatestPacket(packet);
+      this.generateLatestPacket(packet);
+    }
+  }
+
+  /**
+   * @param {SemanticPacket | null} packet
+   * @returns {void}
+   */
+  generateLatestPacket(packet) {
+    if (!this.isRunning || !packet || this.generationStatus === GenerationStatus.generating) {
+      return;
+    }
+
+    const packetKey = JSON.stringify(packet);
+    if (packetKey === this.lastGeneratedPacketKey) {
+      return;
+    }
+
+    const prompt = buildPrompt(packet, this.config.imageGeneration);
+    this.lastGeneratedPacketKey = packetKey;
+    this.generationStatus = GenerationStatus.generating;
+    renderReconstruction(this.reconstructionContainer, {
+      status: GenerationStatus.generating,
+    });
+
+    const runToken = this.runToken;
+    void this.requestGeneration(prompt, runToken);
+  }
+
+  /**
+   * @param {string} prompt
+   * @param {number} runToken
+   * @returns {Promise<void>}
+   */
+  async requestGeneration(prompt, runToken) {
+    try {
+      const result = await generateImage(prompt);
+      if (!this.isCurrentRun(runToken)) {
+        return;
+      }
+
+      this.generationStatus = GenerationStatus.success;
+      renderReconstruction(this.reconstructionContainer, {
+        status: GenerationStatus.success,
+        imageUrl: result.imageUrl,
+      });
+    } catch (error) {
+      if (!this.isCurrentRun(runToken)) {
+        return;
+      }
+
+      this.generationStatus = GenerationStatus.error;
+      renderReconstruction(this.reconstructionContainer, {
+        status: GenerationStatus.error,
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
