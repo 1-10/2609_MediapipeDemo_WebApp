@@ -13,7 +13,7 @@
     "modelUrl": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
     "threshold": 0.5,
     "inferenceIntervalMs": 66,
-    "silhouetteColor": "#ffffff",
+    "silhouetteColor": "#2f8dff",
     "backgroundColor": "#000000"
   },
   "mosaic": {
