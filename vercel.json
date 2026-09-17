@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/web/index.html" },
+    { "source": "/js/(.*)", "destination": "/web/js/$1" },
+    { "source": "/css/(.*)", "destination": "/web/css/$1" },
+    { "source": "/vendor/(.*)", "destination": "/web/vendor/$1" }
+  ],
+  "functions": {
+    "api/generate-image.js": {
+      "maxDuration": 30
+    }
+  }
+}
