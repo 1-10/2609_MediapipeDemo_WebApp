@@ -22,7 +22,7 @@
     "bboxExpansionVertical": 0.15
   },
   "objectDetector": {
-    "modelUrl": "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/latest/efficientdet_lite0.tflite",
+    "modelUrl": "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite2/float16/latest/efficientdet_lite2.tflite",
     "scoreThreshold": 0.5,
     "maxResults": 10,
     "inferenceIntervalMs": 300
