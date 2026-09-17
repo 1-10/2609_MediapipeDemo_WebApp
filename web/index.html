@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MediaPipe Demo App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/app.css">
   </head>
   <body>
@@ -21,17 +24,17 @@
       <video id="cameraSource" class="camera-source" autoplay muted playsinline aria-hidden="true"></video>
 
       <section id="mode1Panes" class="mode1-panes" aria-label="Mode 1 abstraction comparison">
-        <article class="pane">
+        <article class="pane pane--cyan">
           <h2>侵入者検知</h2>
           <p class="bandwidth-label">〜10kbps</p>
           <canvas id="silhouetteCanvas" width="1280" height="720"></canvas>
         </article>
-        <article class="pane">
+        <article class="pane pane--violet">
           <h2>プライバシー配慮</h2>
           <p class="bandwidth-label">〜100kbps</p>
           <canvas id="mosaicCanvas" width="1280" height="720"></canvas>
         </article>
-        <article class="pane">
+        <article class="pane pane--hot">
           <h2>顔認証映像</h2>
           <p class="bandwidth-label">数十〜100Mbps</p>
           <canvas id="faceOverlayCanvas" width="1280" height="720"></canvas>
@@ -40,15 +43,15 @@
       </section>
 
       <section id="mode2Panes" class="mode2-panes is-hidden" aria-label="Mode 2 semantic communication" aria-hidden="true">
-        <article class="pane">
+        <article class="pane pane--cyan">
           <h2>LIVE VIDEO</h2>
           <canvas id="mode2LeftVideoCanvas" width="1280" height="720"></canvas>
         </article>
-        <article class="pane semantic-pane">
+        <article class="pane pane--violet semantic-pane">
           <h2>TRANSMITTED SEMANTICS</h2>
           <ul id="semanticInfoList" class="semantic-info-list"></ul>
         </article>
-        <article class="pane reconstruction-pane">
+        <article class="pane pane--hot reconstruction-pane">
           <h2>RECONSTRUCTION</h2>
           <div id="reconstructionContainer" class="reconstruction-placeholder">Coming soon</div>
         </article>
